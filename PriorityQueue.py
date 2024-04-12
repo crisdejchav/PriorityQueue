@@ -17,7 +17,7 @@ class Persona:
             return 4  # Prioridad 4 para demás personas
         
     def __str__(self):
-        return f"Nombre: {self.nombre}, Edad: {self.edad}, Dirección: {self.direccion}, Motivo: {self.motivo}, Gravedad: {self.gravedad}, Unidad Móvil: {'Motorizada' if self.unidad_movil<3 else 'Con patrulla y unidades de refuerzo'}"
+        return f"Nombre: {self.nombre}, Edad: {self.edad}, Dirección: {self.direccion}, Motivo: {self.motivo}, Gravedad: {self.gravedad}, Unidad Móvil: {'Motorizada' if self.unidad_movil<3 else 'Con patruya y unidades de refuerzo'}"
 
 
 class MonticuloBinario:
@@ -27,9 +27,8 @@ class MonticuloBinario:
 
     def encolar(self, persona):
         self.listaMonticulo.append(persona)
-        self.tamanoActual = self.tamanoActual + 1
+        self.tamanoActual += 1
         self.infiltArriba(self.tamanoActual)
-
 
     def infiltArriba(self, i):
         while i // 2 > 0:
@@ -39,12 +38,19 @@ class MonticuloBinario:
 
     def infiltAbajo(self, i):
         while (i * 2) <= self.tamanoActual:
-            hm = self.hijoMin(i)
+            hm : int = self.hijoMin(i)
             if self.es_menor(self.listaMonticulo[hm], self.listaMonticulo[i]):
                 self.swap(i, hm)
+            elif self.listaMonticulo[hm].gravedad == self.listaMonticulo[i].gravedad:
+                if self.listaMonticulo[hm].prioridad < self.listaMonticulo[i].prioridad:
+                    self.swap(i, hm)
+                else:
+                    break
+            else:
+                break
             i = hm
 
-    def es_menor(self, persona1, persona2):
+    def es_menor(self, persona1: Persona, persona2: Persona):
         if persona1.gravedad < persona2.gravedad:
             return True
         elif persona1.gravedad == persona2.gravedad:
@@ -65,18 +71,17 @@ class MonticuloBinario:
             elif self.listaMonticulo[hijo_izquierdo].gravedad > self.listaMonticulo[hijo_derecho].gravedad:
                 return hijo_derecho
             else:
-                # Si la gravedad de los hijos es la misma, se compara la prioridad
                 if self.listaMonticulo[hijo_izquierdo].prioridad < self.listaMonticulo[hijo_derecho].prioridad:
                     return hijo_izquierdo
                 elif self.listaMonticulo[hijo_izquierdo].prioridad > self.listaMonticulo[hijo_derecho].prioridad:
                     return hijo_derecho
                 else:
-                    # Si la prioridad de los hijos también es la misma, se elige el hijo con el menor nombre
-                    return hijo_izquierdo if self.listaMonticulo[hijo_izquierdo].nombre < self.listaMonticulo[hijo_derecho].nombre else hijo_derecho
-
-
+                    return hijo_izquierdo if self.listaMonticulo[hijo_izquierdo].gravedad < self.listaMonticulo[hijo_derecho].gravedad else hijo_derecho
 
     def eliminarMin(self):
+        if self.tamanoActual == 0:
+            return None  # No hay elementos en el montículo
+
         valorSacado = self.listaMonticulo[1]
         self.listaMonticulo[1] = self.listaMonticulo[self.tamanoActual]
         self.tamanoActual = self.tamanoActual - 1
@@ -84,32 +89,31 @@ class MonticuloBinario:
         self.infiltAbajo(1)
         return valorSacado
 
-    def mostrar_cola(self,p=None):
+    def mostrar_cola(self, p=None):
         if len(self.listaMonticulo) <= 1:
             print("No hay personas en espera.")
             return
 
-        # Creamos una lista temporal para almacenar las personas en orden de gravedad y prioridad
-        personas_ordenadas = []
-
-        # Creamos una copia del montículo para no modificarlo
         monticulo_copia = self.listaMonticulo[1:]
 
-        # Ordenamos la copia del montículo primero por gravedad de menor a mayor y luego por prioridad dentro de cada grupo de igual gravedad
-        for i in range(len(monticulo_copia)):
-            for j in range(len(monticulo_copia) - 1):
-                # Comparar gravedad y prioridad de dos personas
-                if monticulo_copia[j].gravedad > monticulo_copia[j + 1].gravedad or \
-                        (monticulo_copia[j].gravedad == monticulo_copia[j + 1].gravedad and
-                        monticulo_copia[j].prioridad > monticulo_copia[j + 1].prioridad):
-                    # Intercambiar las personas si están en el orden incorrecto
-                    monticulo_copia[j], monticulo_copia[j + 1] = monticulo_copia[j + 1], monticulo_copia[j]
+        # Construir el montículo
+        for i in range(len(monticulo_copia) // 2, 0, -1):
+            self.infiltAbajo(i)
 
-        # Mostramos las personas ordenadas
+        # Ordenar el montículo
+        personas_ordenadas = []
+        while self.tamanoActual > 0:
+            persona = self.eliminarMin()
+            personas_ordenadas.append(persona)
+
+
+        #Se devuelven los valores al monticulo
+        self.listaMonticulo[1:] = personas_ordenadas
+        self.tamanoActual = len(self.listaMonticulo)-1
+        # Mostrar las personas ordenadas
         print("Cola de prioridad ordenada:")
-        for persona in monticulo_copia:
+        for persona in personas_ordenadas:
             print(persona)
-    
     def posicion(self, llamada):
         for i in range(1, len(self.listaMonticulo)):
             if self.listaMonticulo[i] == llamada:
@@ -185,8 +189,10 @@ def test():
     siguiente_solicitud = cola_prioridad.eliminarMin()
     print("Solicitud atendida:", siguiente_solicitud) 
     
-
-
+    print("Cola de prioridad:")
+    cola_prioridad.mostrar_cola()
+    
+     
 #Para usar los casos de prueba quitar el '#' a la funcion test
 #Para ingresar los casos por consola quitar el '#' a la funcion menu
 #test()
