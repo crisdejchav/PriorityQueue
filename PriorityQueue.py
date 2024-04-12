@@ -17,7 +17,7 @@ class Persona:
             return 4  # Prioridad 4 para demás personas
         
     def __str__(self):
-        return f"Nombre: {self.nombre}, Edad: {self.edad}, Dirección: {self.direccion}, Motivo: {self.motivo}, Gravedad: {self.gravedad}, Unidad Móvil: {'Motorizada' if self.unidad_movil<3 else 'Con patruya y unidades de refuerzo'}"
+        return f"Nombre: {self.nombre}, Edad: {self.edad}, Dirección: {self.direccion}, Motivo: {self.motivo}, Gravedad: {self.gravedad}, Unidad Móvil: {'Motorizada' if self.unidad_movil<3 else 'Con patrulla y unidades de refuerzo'}"
 
 
 class MonticuloBinario:
@@ -150,7 +150,7 @@ def ingresar_persona(cola_prioridad: MonticuloBinario):
     edad = int(input("Ingrese la edad del solicitante: "))
     direccion = input("Ingrese la dirección del solicitante: ")
     motivo = input("Ingrese el motivo de la llamada: ")
-    gravedad = int(input("Ingrese la gravedad (1 a 4, siendo 1 la mayor gravedad): "))
+    gravedad = int(input("Ingrese la gravedad (1 a 5, siendo 1 la mayor gravedad): "))
 
     persona = Persona(nombre, edad, direccion, motivo, gravedad)
     cola_prioridad.encolar(persona)
